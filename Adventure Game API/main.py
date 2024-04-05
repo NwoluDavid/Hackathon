@@ -5,7 +5,7 @@ app = FastAPI()
 
 
 
-player_inventory =[]
+player_inventory =["gamegear"]
 
 """
 Define a dictionary with location names as keys and details (description, items available, etc.) as values.
@@ -40,7 +40,7 @@ game_location_details = {
   }
 }
 
-@app.get("/inventory/add")
+@app.post("/inventory/add")
 async def Add_item(item : str):
     """
     Endpoint: /inventory/add 
@@ -51,12 +51,15 @@ async def Add_item(item : str):
     
     Response: Return the updated inventory.
         """
-    add_item = player_inventory.append(item)
-    
-    if add_item:
-        return {"message": "item added successfully"}
-    else:
-        raise HTTPException 
+    # add_item = player_inventory.append(item)
+    try:  
+        if item: 
+            player_inventory.append(item)
+        else:
+            raise HTTPException (status_code=404, detail="no item found")
+        return {"inventory": player_inventory,  "message": "item added successfully"}
+    except HTTPException and ValueError as e :
+        return {"eror": e}
 
 """
     Endpoint: /inventory/remove ()
@@ -66,7 +69,12 @@ async def Add_item(item : str):
 """
 @app.delete ("/inventory/remove")
 async def remove_item (item: str):
-
-    remove_item = player_inventory.remove(item)
-    if remove_item:
-        return {"message " : "Item removed successfully"}
+    try:
+        
+        if item:
+            player_inventory.remove(item)
+        else:
+            raise HTTPException(status_code=404, detail="item not found")
+        return {"inventory": player_inventory ,"message " : "Item removed successfully"}
+    except HTTPException and ValueError as e :
+        return {"eror": e}
